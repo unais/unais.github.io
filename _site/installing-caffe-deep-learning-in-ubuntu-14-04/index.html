@@ -5,15 +5,15 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>HelloWorld &#8211; My Tech Blog</title>
-<meta name="description" content="Example and code for using link posts.">
-<meta name="keywords" content="sample post, link post">
+<title>Installing Caffe - Deep Learning in Ubuntu 14.04 &#8211; My Tech Blog</title>
+
+<meta name="keywords" content="">
 
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="HelloWorld">
-<meta name="twitter:description" content="Example and code for using link posts.">
+<meta name="twitter:title" content="Installing Caffe - Deep Learning in Ubuntu 14.04">
+
 <meta name="twitter:site" content="@unais_t">
 <meta name="twitter:creator" content="@unais_t">
 
@@ -23,16 +23,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HelloWorld">
-<meta property="og:description" content="Example and code for using link posts.">
-<meta property="og:url" content="/HelloWorld/">
+<meta property="og:title" content="Installing Caffe - Deep Learning in Ubuntu 14.04">
+
+<meta property="og:url" content="/installing-caffe-deep-learning-in-ubuntu-14-04/">
 <meta property="og:site_name" content="My Tech Blog">
 
 
 
 
 
-<link rel="canonical" href="/HelloWorld/">
+<link rel="canonical" href="/installing-caffe-deep-learning-in-ubuntu-14-04/">
 <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="My Tech Blog Feed">
 
 <!-- http://t.co/dKP3o1e -->
@@ -139,17 +139,116 @@
   <article class="post">
     <div class="headline-wrap">
       
-        <h1><a href="http://mademistakes.com">HelloWorld</a></h1>
+        <h1><a href="/installing-caffe-deep-learning-in-ubuntu-14-04/" rel="bookmark" title="Installing Caffe - Deep Learning in Ubuntu 14.04">Installing Caffe - Deep Learning in Ubuntu 14.04</a></h1>
       
     </div><!--/ .headline-wrap -->
     <div class="article-wrap">
-      <p>This theme supports <strong>link posts</strong>, made famous by John Gruber. To use, just add <code>link: http://url-you-want-linked</code> to the post’s YAML front matter and you’re done.</p>
+      <p>Caffe is a deep learning framework made by Berkely Vision and Learning Center(BVLC).The project is created by Yangqing Jia created the project during his PhD at UC Berkeley. Caffe is released under the BSD 2-Clause license.</p>
 
-<blockquote>
-  <p>And this is how a quote looks.</p>
-</blockquote>
+<p>Caffe is apure C++/CUDA architecture for deep learning with command line,Python &amp; MATLAB interfaces.</p>
 
-<p>Some <a href="http://www.mademistakes.com">link</a> can also be shown.</p>
+<p>Here I am going explain how we can install caffe in a personal laptop without CUDA support. I am using Inter INSPIRON dual core CPU with no spectial graphics card.</p>
+
+<p>NB: It is better to have a freshly installed Ubuntu 14.04. Also install OpenCV latest version. You can follow the following tutorial to install OpenCV ihttp://www.samontab.com/web/2014/06/installing-opencv-2-4-9-in-ubuntu-14-04-lts/</p>
+
+<p>First clone the latest release of caffe from its official repositary.</p>
+
+<p>git clone https://github.com/BVLC/caffe.git
+#add these following lines in the end of your .bashrc file
+export PYTHONPATH=$PYTHONPATH:$HOME/caffe/python
+export PYTHONPATH=$PYTHONPATH:$HOME/caffe/python/caffe</p>
+
+<p>Install the python packages required for pycaffe.Install Anaconda python distribution since it install all necessary python wrappers required for the caffe</p>
+
+<p>Download latest Anaconda distribution from https://www.continuum.io/downloads
+.And run the following commands to add path in ~/.bashrc</p>
+
+<p>bash Anaconda-2.1.0-Linux-x86_64.sh
+#add the following line at the end to your .bashrc
+export PATH=/home/suryateja/anaconda/bin:$PATH</p>
+
+<p>Or install all python dependencies from dependencies file is in caffe/python</p>
+
+<p>cd python/
+for req in $(cat requirements.txt); do sudo pip install $req; done</p>
+
+<p>install hdf5 via apt-get</p>
+
+<p>sudo apt-get install libhdf5-serial-dev</p>
+
+<p>Download and install gflags on your system. gflags or formerly google command line flags package contains a C++ library that implements command line flags for processing.</p>
+
+<p>wget https://github.com/schuhschuh/gflags/archive/master.zip
+unzip master.zip
+cd gflags-master
+mkdir build &amp;&amp; cd build
+export CXXFLAGS=”-fPIC” &amp;&amp; cmake .. &amp;&amp; make VERBOSE=1&lt;/pre&gt;</p>
+<pre>make
+sudo make install
+
+Download google-glog and install. You can also install through apt-get. And install snappy.
+
+
+tar -xvzf google-glog_0.3.3.orig.tar.gz
+cd glog-0.3.3/
+./configure
+make
+sudo make install
+agi libgoogle-glog-dev
+agi libsnappy-dev
+
+Get leveldb onto your machine and lmdb with its dependencies.
+
+git clone https://code.google.com/p/leveldb/
+cd leveldb
+make
+cp --preserve=links libleveldb.* /usr/local/lib
+sudo cp --preserve=links libleveldb.* /usr/local/lib
+sudo cp -r include/leveldb /usr/local/include/
+ldconfig
+sudo ldconfig
+sudo apt-get install libffi-dev python-dev build-essential
+sudo apt-get install liblmdb-dev
+
+
+Download and install Atlas and Lapack. and Change the scaling for all of your CPU cores to replace the single word in the file with ‘performance’.
+
+gksu emacs /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+gksu emacs /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+gksu emacs /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
+gksu emacs /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
+ 
+bunzip2 -c atlas3.10.2.tar.bz2 | tar xfm -
+mv ATLAS ATLAS3.10.2
+cd ATLAS3.10.2
+mkdir Linux_C2D64SSE3
+cd Linux_C2D64SSE3
+../configure -b 64 -D c -DPentiumCPS=2400 --prefix=/home/suryateja/lib/atlas --with-netlib-lapack-tarfile=/home/suryateja/Downloads/lapack-3.5.0.tgz
+ 
+make build
+make check
+make ptcheck
+make time
+sudo make install
+
+
+
+Now uncomment the CPU_ONLY := 1 in Makefile.config (Keep a backup of Makefile ) 
+
+cd caffe
+cp Makefile.config.example Makefile.config
+make all
+make test
+make runtest
+
+
+If you are lucky the caffe is installed now.
+NB: If some libraries are not installing from command prompt try to install it through synaptic package manager.
+
+
+
+
+</pre>
 
       <hr />
       <footer role="contentinfo">
@@ -157,17 +256,17 @@
   <h4>Share on</h4>
   <ul>
     <li>
-      <a href="https://twitter.com/intent/tweet?text=/HelloWorld/" class="twitter" title="Share on Twitter"><i class="fa fa-twitter"></i><span> Twitter</span></a>
+      <a href="https://twitter.com/intent/tweet?text=/installing-caffe-deep-learning-in-ubuntu-14-04/" class="twitter" title="Share on Twitter"><i class="fa fa-twitter"></i><span> Twitter</span></a>
     </li>
     <li>
-      <a href="https://www.facebook.com/sharer/sharer.php?u=/HelloWorld/" class="facebook" title="Share on Facebook"><i class="fa fa-facebook"></i><span> Facebook</span></a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=/installing-caffe-deep-learning-in-ubuntu-14-04/" class="facebook" title="Share on Facebook"><i class="fa fa-facebook"></i><span> Facebook</span></a>
     </li>
     <li>
-      <a href="https://plus.google.com/share?url=/HelloWorld/" class="google-plus" title="Share on Google Plus"><i class="fa fa-google-plus"></i><span> Google+</span></a>
+      <a href="https://plus.google.com/share?url=/installing-caffe-deep-learning-in-ubuntu-14-04/" class="google-plus" title="Share on Google Plus"><i class="fa fa-google-plus"></i><span> Google+</span></a>
     </li>
   </ul>
 </div><!-- /.social-share -->
-        <p class="byline"><strong>HelloWorld</strong> was published on <time datetime="2013-08-12T00:00:00+05:30">August 12, 2013</time>.</p>
+        <p class="byline"><strong>Installing Caffe - Deep Learning in Ubuntu 14.04</strong> was published on <time datetime="2015-11-08T11:19:37+05:30">November 08, 2015</time>.</p>
       </footer>
     </div><!-- /.article-wrap -->
   
@@ -180,7 +279,7 @@
   <h4>You might also enjoy <small class="pull-right">(<a href="/posts/">View all posts</a>)</small></h4>
     <ul>
     
-      <li><a href="/installing-caffe-deep-learning-in-ubuntu-14-04/" title="Installing Caffe - Deep Learning in Ubuntu 14.04">Installing Caffe - Deep Learning in Ubuntu 14.04</a></li>
+      <li><a href="/HelloWorld/" title="HelloWorld">HelloWorld</a></li>
     
     </ul>
     <hr />
